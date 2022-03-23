@@ -28,7 +28,7 @@ var (
 )
 
 // RecoveryFunc defines the function passable to CustomRecovery.
-type RecoveryFunc func(c *Context, err interface{})
+type RecoveryFunc func(c *Context, err any)
 
 // Recovery returns a middleware that recovers from any panics and writes a 500 if there was one.
 func Recovery() HandlerFunc {
@@ -102,7 +102,7 @@ func CustomRecoveryWithWriter(out io.Writer, handle RecoveryFunc) HandlerFunc {
 	}
 }
 
-func defaultHandleRecovery(c *Context, err interface{}) {
+func defaultHandleRecovery(c *Context, err any) {
 	c.AbortWithStatus(http.StatusInternalServerError)
 }
 
@@ -155,7 +155,7 @@ func function(pc uintptr) []byte {
 	//	runtime/debug.*T·ptrmethod
 	// and want
 	//	*T.ptrmethod
-	// Also the package path might contains dot (e.g. code.google.com/...),
+	// Also the package path might contain dot (e.g. code.google.com/...),
 	// so first eliminate the path prefix
 	if lastSlash := bytes.LastIndex(name, slash); lastSlash >= 0 {
 		name = name[lastSlash+1:]

@@ -357,7 +357,7 @@ func TestUnescapeParameters(t *testing.T) {
 	checkPriorities(t, tree)
 }
 
-func catchPanic(testFunc func()) (recv interface{}) {
+func catchPanic(testFunc func()) (recv any) {
 	defer func() {
 		recv = recover()
 	}()
@@ -587,7 +587,15 @@ func TestTreeTrailingSlashRedirect(t *testing.T) {
 		"/doc/go1.html",
 		"/no/a",
 		"/no/b",
-		"/api/hello/:name",
+		"/api/:page/:name",
+		"/api/hello/:name/bar/",
+		"/api/bar/:name",
+		"/api/baz/foo",
+		"/api/baz/foo/bar",
+		"/blog/:p",
+		"/posts/:b/:c",
+		"/posts/b/:c/d/",
+		"/vendor/:x/*y",
 	}
 	for _, route := range routes {
 		recv := catchPanic(func() {
@@ -613,7 +621,20 @@ func TestTreeTrailingSlashRedirect(t *testing.T) {
 		"/admin/config/",
 		"/admin/config/permissions/",
 		"/doc/",
+		"/admin/static/",
+		"/admin/cfg/",
+		"/admin/cfg/users/",
+		"/api/hello/x/bar",
+		"/api/baz/foo/",
+		"/api/baz/bax/",
+		"/api/bar/huh/",
+		"/api/baz/foo/bar/",
+		"/api/world/abc/",
+		"/blog/pp/",
+		"/posts/b/c/d",
+		"/vendor/x",
 	}
+
 	for _, route := range tsrRoutes {
 		value := tree.getValue(route, nil, getSkippedNodes(), false)
 		if value.handlers != nil {
@@ -629,7 +650,11 @@ func TestTreeTrailingSlashRedirect(t *testing.T) {
 		"/no/",
 		"/_",
 		"/_/",
-		"/api/world/abc",
+		"/api",
+		"/api/",
+		"/api/hello/x/foo",
+		"/api/baz/foo/bad",
+		"/foo/p/p",
 	}
 	for _, route := range noTsrRoutes {
 		value := tree.getValue(route, nil, getSkippedNodes(), false)

@@ -18,10 +18,10 @@ type defaultValidator struct {
 	validate *validator.Validate
 }
 
-type sliceValidateError []error
+type SliceValidationError []error
 
-// Error concatenates all error elements in sliceValidateError into a single string separated by \n.
-func (err sliceValidateError) Error() string {
+// Error concatenates all error elements in SliceValidationError into a single string separated by \n.
+func (err SliceValidationError) Error() string {
 	n := len(err)
 	switch n {
 	case 0:
@@ -46,7 +46,7 @@ func (err sliceValidateError) Error() string {
 var _ StructValidator = &defaultValidator{}
 
 // ValidateStruct receives any kind of type, but only performed struct or pointer to struct type.
-func (v *defaultValidator) ValidateStruct(obj interface{}) error {
+func (v *defaultValidator) ValidateStruct(obj any) error {
 	if obj == nil {
 		return nil
 	}
@@ -59,7 +59,7 @@ func (v *defaultValidator) ValidateStruct(obj interface{}) error {
 		return v.validateStruct(obj)
 	case reflect.Slice, reflect.Array:
 		count := value.Len()
-		validateRet := make(sliceValidateError, 0)
+		validateRet := make(SliceValidationError, 0)
 		for i := 0; i < count; i++ {
 			if err := v.ValidateStruct(value.Index(i).Interface()); err != nil {
 				validateRet = append(validateRet, err)
@@ -75,7 +75,7 @@ func (v *defaultValidator) ValidateStruct(obj interface{}) error {
 }
 
 // validateStruct receives struct type
-func (v *defaultValidator) validateStruct(obj interface{}) error {
+func (v *defaultValidator) validateStruct(obj any) error {
 	v.lazyinit()
 	return v.validate.Struct(obj)
 }
@@ -84,7 +84,7 @@ func (v *defaultValidator) validateStruct(obj interface{}) error {
 // Validator instance. This is useful if you want to register custom validations
 // or struct level validations. See validator GoDoc for more info -
 // https://pkg.go.dev/github.com/go-playground/validator/v10
-func (v *defaultValidator) Engine() interface{} {
+func (v *defaultValidator) Engine() any {
 	v.lazyinit()
 	return v.validate
 }
